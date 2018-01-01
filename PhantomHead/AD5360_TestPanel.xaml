@@ -1,0 +1,62 @@
+﻿<Page
+    x:Class="PhantomHead.AD5360_TestPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PhantomHead"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" Height="500" Width="650">
+
+
+        <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Height="500" VerticalAlignment="Top" Margin="0,0,0,0">
+            <Grid HorizontalAlignment="Left" Height="500" Margin="0,0,0,0" VerticalAlignment="Top" Width="650">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock x:Name="Heading" Text="EEG Test Panel" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="4" FontSize="20" />
+                <!--<TextBlock x:Name="Value" Text="Value:" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1" FontSize="20" TextAlignment="Center"/>
+                <TextBox x:Name="txt_Value" Grid.Column="1" Grid.Row="3" Height="40" Margin="5,0,5,0" Text="0" />
+                
+                <Button x:Name="btnWriteValue" Content="Write" HorizontalAlignment="Left" 
+                        Height="50" Margin="5,5,0,0" Grid.Row="4" VerticalAlignment="Top" 
+                        Grid.ColumnSpan="1" Width="110" Click="Click_write"/>-->
+            
+                <Button x:Name="btnSquareWave" Content="Square Wave" HorizontalAlignment="Left" 
+                        Height="50" Margin="5,5,0,0" Grid.Row="4" Grid.Column="1" VerticalAlignment="Top" 
+                        Grid.ColumnSpan="1" Width="110" Click="btnSquareWave_Click"/>            
+            
+                <Button x:Name="btnReadFile" Content="Normal EEG" HorizontalAlignment="Left" 
+                    Height="50" Margin="5,5,0,0" Grid.Column="2" Grid.Row="4" 
+                    VerticalAlignment="Top" Grid.ColumnSpan="1" Width="110" Click="btnReadFile_Click"/>
+
+                <!--<Button x:Name="btnReset" Grid.Column="4" Grid.Row="1" Width="105" Grid.ColumnSpan="1"
+                    Height="50" Margin="5,5,0,5" Content="Reset" Click="Click_Reset"/>
+            
+                <Button x:Name="btnLDAC" Grid.Column="4" Grid.Row="2" Width="105" Grid.ColumnSpan="1"
+                    Height="50" Margin="5,5,0,5" Content="LDAC" Click="Click_LDAC"/>-->
+            
+                <!--<Button x:Name="btnClear" Grid.Column="4" Grid.Row="3" Width="105" Grid.ColumnSpan="1"-->
+                    <!--Height="50" Margin="5,5,0,5" Content="Clear" Click="Click_Clear"/>-->
+            
+                <Button x:Name="btnClose" Grid.Column="4" Grid.Row="5" Width="105" Grid.ColumnSpan="1"
+                    Height="50" Margin="5,5,0,5" Content="Close" Click="Click_Close"/>
+                
+                <Button x:Name="btnStop" Grid.Column="1" Grid.Row="5" Width="105" Grid.ColumnSpan="1"
+                    Height="50" Margin="5,5,0,5" Content="Stop" Click="Click_Stop"/>
+
+        </Grid>
+        </Grid>
+</Page>

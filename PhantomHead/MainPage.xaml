@@ -8,17 +8,12 @@
     mc:Ignorable="d" Height="500" Width="650">
 
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Height="500" VerticalAlignment="Top" Margin="0,0,-51,0">
-        <Grid HorizontalAlignment="Left" Height="500" Margin="10,10,0,0" VerticalAlignment="Top" Width="650">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Height="500" VerticalAlignment="Top" Margin="0,0,0,0">
+        <Grid HorizontalAlignment="Left" Height="500" Margin="0,0,0,0" VerticalAlignment="Top" Width="650">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="80"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -29,70 +24,15 @@
                 <RowDefinition Height="60"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
+            
             <Button x:Name="btnShutdown" Grid.Column="0" Grid.Row="0" Width="105" Grid.ColumnSpan="1" 
                         Height="50" Margin="5,5,0,5" Content="Shutdown" Click="btnShutodown_Click"/>
-            <Button x:Name="btnStopPlayback" Grid.Column="0" Grid.Row="1" Width="50" Height="50" Margin="5,5,5,5" Content="Stop" 
-                    Click="StopButton_Click"/>
-            <!--<TextBox x:Name="txtFileName" Grid.ColumnSpan="3" HorizontalAlignment="Left" 
-                         Margin="5,10,0,0" Grid.Row="2" TextWrapping="Wrap" 
-                         Text="{Binding SampleFile}" VerticalAlignment="Top" Width="170"/>-->
-            <Button x:Name="btnWrite" Content="Write" HorizontalAlignment="Left" 
-                        Height="50" Margin="5,5,0,0" Grid.Row="3" VerticalAlignment="Top" 
-                        Grid.ColumnSpan="2" Width="110" Click="Click_write"/>
-            <Button x:Name="btnCreateFile" Content="Square Wave" HorizontalAlignment="Left" 
-                        Height="70" Margin="5,5,0,0" Grid.Row="4" VerticalAlignment="Top" 
-                        Grid.ColumnSpan="1" Width="110" Click="btnSquareWave_Click"/>
-            <Button x:Name="btnReadFile" Content="Normal EEG" HorizontalAlignment="Left" 
-                        Height="70" Margin="5,5,0,0" Grid.Column="1" Grid.Row="4" 
-                        VerticalAlignment="Top" Grid.ColumnSpan="1" Width="110" Click="btnReadFile_Click"/>
+            
             <Button x:Name="btnRestart" Grid.Column="1" Grid.Row="0" Width="105" Grid.ColumnSpan="1"
                         Height="50" Margin="5,5,0,5" Content="Restart" Click="btnRestart_Click"/>
-            <Button x:Name="btnReset" Grid.Column="1" Grid.Row="1" Width="105" Grid.ColumnSpan="1"
-                        Height="50" Margin="5,5,0,5" Content="Reset" Click="Click_Reset"/>
-            <Button x:Name="btnLDAC" Grid.Column="1" Grid.Row="2" Width="105" Grid.ColumnSpan="1"
-                        Height="50" Margin="5,5,0,5" Content="LDAC" Click="Click_LDAC"/>
-            <Button x:Name="btnClear" Grid.Column="1" Grid.Row="3" Width="105" Grid.ColumnSpan="1"
-                        Height="50" Margin="5,5,0,5" Content="Clear" Click="Click_Clear"/>
-            <TextBox x:Name="txt_SramWriteData" Grid.ColumnSpan="2" Grid.Column="4" HorizontalAlignment="Left" Margin="5,5,0,0"
-                     Grid.Row="1" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
-            <TextBox x:Name="txt_SramAddress" Grid.ColumnSpan="2" Grid.Column="4" HorizontalAlignment="Left" Margin="5,5,0,0"
-                     Grid.Row="3" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
-            <Button x:Name="SramWriteByteMode" Grid.Column="6" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"
-                    Click="SramWriteByteMode_Click">
-                <TextBlock>Byte<LineBreak/>Mode</TextBlock>
-            </Button>
-            <Button x:Name="SramWritePageMode" Grid.Column="6" Grid.Row="1" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Click="SramWritePageMode_Click">
-                <TextBlock>Page<LineBreak/>Mode</TextBlock>
-            </Button>
-            <Button x:Name="SramWriteSequentialMode" Grid.Column="5" Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,0"
-                    VerticalAlignment="Top" Click="SramWriteSequentialMode_Click">
-                <TextBlock>Seql<LineBreak/>Mode</TextBlock>
-            </Button>
-            <TextBox x:Name="txtSramMode" HorizontalAlignment="Left" Margin="5,5,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"
-                     Grid.Column="7" Grid.Row="0"/>
-            <Button x:Name="SramReadModeRegister" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"
-                    Click="SramReadModeRegister_Click" Grid.Column="7" Grid.Row="1" Height="50" Width="70">
-                <TextBlock>Read<LineBreak/>Mode</TextBlock>
-            </Button>
-            <Button x:Name="SramWriteByte" Grid.Column="6" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="2" 
-                    VerticalAlignment="Top" Height="50" Width="60" Click="SramWriteByte_Click">
-                <TextBlock>Write<LineBreak/>Byte</TextBlock>
-            </Button>
-            <TextBox x:Name="txt_SramReadData" Grid.ColumnSpan="2" Grid.Column="4" HorizontalAlignment="Left" Height="12"
-                     Margin="5,5,0,0" Grid.Row="2" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="71"/>
-            <Button x:Name="SramReadByte" Grid.Column="7" HorizontalAlignment="Left" Height="50" Margin="5,5,0,0" Grid.Row="2"
-                    VerticalAlignment="Top" Width="70" Click="SramReadByte_Click">
-                <TextBlock>Read<LineBreak/>Byte</TextBlock>
-            </Button>
-            <Button x:Name="SramWritePage" Grid.Column="6" HorizontalAlignment="Left" Margin="0,5,0,0" Grid.Row="3"
-                    VerticalAlignment="Top" Height="50" Width="60" Click="SramWritePage_Click">
-                <TextBlock>Write<LineBreak/>Page</TextBlock>
-            </Button>
-            <Button x:Name="SramReadPage" Grid.Column="7" HorizontalAlignment="Left" Height="50" Margin="5,5,0,0"
-                    Grid.Row="3" VerticalAlignment="Top" Width="70" Click="SramReadPage_Click">
-                <TextBlock>Read<LineBreak/>Page</TextBlock>
-            </Button>
-            <TextBlock x:Name="txtBlk_LargeData" Grid.ColumnSpan="1" Grid.Column="7" HorizontalAlignment="Left" Height="39" Margin="0,151,-40,-130" Grid.Row="3" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="181"/>
+
+            <Button x:Name="btnOpenAd5360Tests" Grid.Column="1" Grid.Row="2" Width="105" Grid.ColumnSpan="1"
+                        Height="50" Margin="5,5,0,5" Content="EEG Test" Click="btnOpenAd5360Tests_Click"/>
         </Grid>
     </Grid>
 </Page>

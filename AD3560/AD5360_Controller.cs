@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Windows.Devices.Gpio;
 using Windows.Devices.Spi;
 using Windows.Foundation;
 using Windows.System.Threading;
@@ -22,7 +23,7 @@ namespace SPIController
     {
         #region Private Members
 
-        private ad5360 ad5360_Board = new ad5360();
+        private ad5360 ad5360_Board;// = new ad5360();
         // Construct a ConcurrentStack
         private ConcurrentStack<_TimeSlice> ad5360_Stack = new ConcurrentStack<_TimeSlice>();
         IAsyncAction ad5360_Timer = null;
@@ -30,6 +31,10 @@ namespace SPIController
         //System.Threading.CancellationToken ad5360_TimerEnd = new System.Threading.CancellationToken();
         private Boolean _Active = false;
         //Thread ad5360_Timer;
+        private const int arduinoTimer = 27;
+        private GpioPin GPIO_Timer;
+
+        private Boolean playBack;
         private byte[] ch1_min10V = new byte[3] { 0xC8, 0x00, 0x00 }; //-12.00v
         private byte[] ch1_min5V = new byte[3] { 0xC8, 0x3F, 0xFF }; //-6.000v
         private byte[] ch1_min7_5V = new byte[3] { 0xC8, 0x20, 0x00 }; //-9.0v
@@ -57,13 +62,30 @@ namespace SPIController
         #region constructors
         public AD5360_Controller(SpiMode spi_Mode, int clkFreq, int ChipSelectLine, string spiDeviceSelection)
         {
-            if (ad5360_Board.IsActive)
+            ad5360_Board = new ad5360(spi_Mode, clkFreq, ChipSelectLine, spiDeviceSelection);
+            playBack = true;
+
+            GpioOpenStatus status = new GpioOpenStatus();
+            var gpio = GpioController.GetDefault();
+
+            if (gpio == null)
             {
-                ad5360_Board.ad5360_Setup(spi_Mode, clkFreq, ChipSelectLine, spiDeviceSelection);
+                return;
             }
-            else
+
+            var open = gpio.TryOpenPin(arduinoTimer, GpioSharingMode.Exclusive, out GPIO_Timer, out status);
+            if (open == true)
             {
-                throw new NotImplementedException();
+                GPIO_Timer.SetDriveMode(GpioPinDriveMode.Input);
+                GpioPinValue tmp = GPIO_Timer.Read();
+                if (tmp == GpioPinValue.Low)
+                {
+                    Debug.WriteLine("BUSY LOW ");
+                }
+                else
+                {
+                    Debug.WriteLine("BUSY HIGH ");
+                }
             }
         }
         #endregion //constructors
@@ -86,29 +108,49 @@ namespace SPIController
             ad5360_Board.pulse_AD5360_LDAC();
         }
 
+        public void stopPlayBack()
+        {
+            playBack = false;
+            ad5360_Board.pulse_AD5360_Reset();
+            ad5360_Stack.Clear();
+        }
+
+        public void startPlayBack()
+        {
+            playBack = true;
+            ad5360_Board.pulse_AD5360_Reset();
+            ad5360_Stack.Clear();
+        }
+
         public void add_WrtieFrame(_TimeSlice timeSlice)
         {
-            ad5360_Stack.Push(timeSlice);
-            if (ad5360_Timer == null)
+            if (playBack == true)
             {
-                ad5360_Timer = ThreadPool.RunAsync(
-                    (workItem) =>
-                     {
-                         Stopwatch sw = new Stopwatch();
-                         while (true)
+                ad5360_Stack.Push(timeSlice);
+                if (ad5360_Timer == null)
+                {
+                    GpioPinValue gpioPinValue;
+                    Boolean toggle = true;
+                    ad5360_Timer = ThreadPool.RunAsync(
+                        (workItem) =>
                          {
-                             sw.Start();
-                             if (sw.ElapsedTicks > 50)
+                             while (true)
                              {
-                                 ad5360_Write();
-                                 sw.Stop();
-                                 sw.Reset();
+                                 gpioPinValue = GPIO_Timer.Read();
+                                 if (gpioPinValue == GpioPinValue.High && toggle == true)
+                                 {
+                                     ad5360_Write();
+                                     toggle = false;
+                                 }
+                                 if (gpioPinValue == GpioPinValue.Low)
+                                 {
+                                     toggle = true;
+                                 }
                              }
                          }
-
-                     }
-                     , WorkItemPriority.High);
-                ad5360_TimeControl = ad5360_Timer;
+                         , WorkItemPriority.High);
+                    ad5360_TimeControl = ad5360_Timer;
+                }
             }
         }
 

@@ -36,9 +36,13 @@ namespace SPIController
             }
         }
 
-        public ad5360()
+        public ad5360(SpiMode spi_Mode, int clkFreq, int chipSelectLine, string spiDeviceSelection)
         {
             IsActive = InitGPIO();
+            if (IsActive)
+            {
+                this.ad5360_Setup(spi_Mode, clkFreq, chipSelectLine, spiDeviceSelection);
+            }
         }
 
         internal async void ad5360_Setup(SpiMode spi_Mode, int clkFreq, int chipSelectLine, string spiDeviceSelection)
@@ -108,33 +112,45 @@ namespace SPIController
                 return false;
             }
 
-            GPIO_LDAC = gpio.OpenPin(ad5360_GPIO_Pins.ad5360_LDAC);
-            GPIO_LDAC.Write(GpioPinValue.Low);
-            GPIO_LDAC.SetDriveMode(GpioPinDriveMode.Output);
+            GpioOpenStatus status = new GpioOpenStatus();
 
-            GPIO_Busy = gpio.OpenPin(ad5360_GPIO_Pins.ad5360_BUSY);
-            GPIO_Busy.SetDriveMode(GpioPinDriveMode.Input);
-            GpioPinValue tmp = GPIO_Busy.Read();
-            if (tmp == GpioPinValue.Low)
+            var open = gpio.TryOpenPin(ad5360_GPIO_Pins.ad5360_LDAC, GpioSharingMode.Exclusive, out GPIO_LDAC, out status);
+            if(open == true)
             {
-                System.Diagnostics.Debug.WriteLine("BUSY LOW ");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("BUSY HIGH ");
+                GPIO_LDAC.Write(GpioPinValue.Low);
+                GPIO_LDAC.SetDriveMode(GpioPinDriveMode.Output);
             }
 
-            GPIO_Reset = gpio.OpenPin(ad5360_GPIO_Pins.ad5360_RESET);
-            GPIO_Reset.Write(GpioPinValue.High);
-            GPIO_Reset.SetDriveMode(GpioPinDriveMode.Output);
+            open = gpio.TryOpenPin(ad5360_GPIO_Pins.ad5360_BUSY, GpioSharingMode.Exclusive, out GPIO_Busy, out status);
+            if (open == true)
+            {
+                GPIO_Busy.SetDriveMode(GpioPinDriveMode.Input);
+                GpioPinValue tmp = GPIO_Busy.Read();
+                if (tmp == GpioPinValue.Low)
+                {
+                    System.Diagnostics.Debug.WriteLine("BUSY LOW ");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("BUSY HIGH ");
+                }
+            }
 
-            GPIO_Clear = gpio.OpenPin(ad5360_GPIO_Pins.ad5360_CLR);
-            GPIO_Clear.Write(GpioPinValue.High);
-            GPIO_Clear.SetDriveMode(GpioPinDriveMode.Output);
+            open = gpio.TryOpenPin(ad5360_GPIO_Pins.ad5360_RESET, GpioSharingMode.Exclusive, out GPIO_Reset, out status);
+            if (open == true)
+            {
+                GPIO_Reset.Write(GpioPinValue.High);
+                GPIO_Reset.SetDriveMode(GpioPinDriveMode.Output);
+            }
 
+            open = gpio.TryOpenPin(ad5360_GPIO_Pins.ad5360_CLR, GpioSharingMode.Exclusive, out GPIO_Clear, out status);
+            if (open == true)
+            {
+                GPIO_Clear.Write(GpioPinValue.High);
+                GPIO_Clear.SetDriveMode(GpioPinDriveMode.Output);
+            }
 
             return true;
-
         }
     }
 }
