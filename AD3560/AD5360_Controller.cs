@@ -77,15 +77,6 @@ namespace SPIController
             if (open == true)
             {
                 GPIO_Timer.SetDriveMode(GpioPinDriveMode.Input);
-                GpioPinValue tmp = GPIO_Timer.Read();
-                if (tmp == GpioPinValue.Low)
-                {
-                    Debug.WriteLine("BUSY LOW ");
-                }
-                else
-                {
-                    Debug.WriteLine("BUSY HIGH ");
-                }
             }
         }
         #endregion //constructors

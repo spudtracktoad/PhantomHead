@@ -29,6 +29,8 @@ namespace PhantomHead
         private const int LED_PIN = 5;
         private string _SampleFile;
         private Boolean _StopEnabled = false;
+        private const int ENABLE_PIN = 18;
+        private GpioPin _enable_Timer;
 
         public string SampleFile
         {
@@ -50,6 +52,39 @@ namespace PhantomHead
         {
             this.InitializeComponent();
             ad5360 = new AD5360_Controller(SpiMode.Mode1, (500 * 1000), 0, "SPI0");
+            Init_Enable();
+        }
+
+        private void Init_Enable()
+        {
+            GpioOpenStatus status = new GpioOpenStatus();
+            var gpio = GpioController.GetDefault();
+
+            if (gpio == null)
+            {
+                return;
+            }
+
+            var open = gpio.TryOpenPin(ENABLE_PIN, GpioSharingMode.Exclusive, out _enable_Timer, out status);
+            if (open == true)
+            {
+                _enable_Timer.SetDriveMode(GpioPinDriveMode.Output);
+                _enable_Timer.Write(GpioPinValue.Low);
+            }
+        }
+
+        private void EnablePlayback()
+        {
+            _StopEnabled = false;
+            _enable_Timer.Write(GpioPinValue.High);
+            ad5360.startPlayBack();
+        }
+
+        private void stopPlayBack()
+        {
+            _StopEnabled = true;
+            _enable_Timer.Write(GpioPinValue.Low);
+            ad5360.stopPlayBack();
         }
 
         private async void OpenFile_Click(object sender, RoutedEventArgs e)
@@ -75,8 +110,8 @@ namespace PhantomHead
 
         private async void btnSquareWave_Click(object sender, RoutedEventArgs e)
         {
-            _StopEnabled = false;
-            ad5360.startPlayBack();
+
+            EnablePlayback();
 
             int count = 1000;
             for (int index = 0; index < count; index++)
@@ -124,8 +159,9 @@ namespace PhantomHead
         {
             //try to use the physical application location or the relative file location from the 
             //location where the application is running
-            _StopEnabled = false;
-            ad5360.startPlayBack();
+
+            EnablePlayback();
+
             var tmp = System.IO.Directory.GetCurrentDirectory();
             tmp += "\\DataFile\\Base_EEG_Data_Play.txt";
             if (File.Exists(tmp))
@@ -244,8 +280,7 @@ namespace PhantomHead
 
         private void Click_Stop(object sender, RoutedEventArgs e)
         {
-            _StopEnabled = true;
-            ad5360.stopPlayBack();
+            stopPlayBack();
         }
     }
 }
