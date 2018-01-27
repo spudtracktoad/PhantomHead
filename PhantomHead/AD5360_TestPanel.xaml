@@ -27,8 +27,9 @@
                 </Grid.RowDefinitions>
                 
                 <TextBlock x:Name="Heading" Text="EEG Test Panel" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="4" FontSize="20" />
-                <!--<TextBlock x:Name="Value" Text="Value:" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1" FontSize="20" TextAlignment="Center"/>
-                <TextBox x:Name="txt_Value" Grid.Column="1" Grid.Row="3" Height="40" Margin="5,0,5,0" Text="0" />
+                <TextBlock x:Name="txt_PlayStatus" Text="Stopped" Grid.Row="3" Grid.Column="3
+                           " Grid.ColumnSpan="1" FontSize="20" TextAlignment="Center" IsColorFontEnabled="True" Foreground="Black"/>
+                <!--<TextBox x:Name="txt_Value" Grid.Column="1" Grid.Row="3" Height="40" Margin="5,0,5,0" Text="0" />
                 
                 <Button x:Name="btnWriteValue" Content="Write" HorizontalAlignment="Left" 
                         Height="50" Margin="5,5,0,0" Grid.Row="4" VerticalAlignment="Top" 

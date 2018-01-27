@@ -99,6 +99,14 @@ namespace SPIController
             ad5360_Board.pulse_AD5360_LDAC();
         }
 
+        public bool playBackBusy()
+        {
+            if (ad5360_Stack.Count > 0)
+                return true;
+            else
+                return false;
+        }
+
         public void stopPlayBack()
         {
             playBack = false;

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using Windows.ApplicationModel;
 using Windows.System;
 using Windows.Media.Devices.Core;
+using System.Threading;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -31,6 +32,7 @@ namespace PhantomHead
         private Boolean _StopEnabled = false;
         private const int ENABLE_PIN = 18;
         private GpioPin _enable_Timer;
+        private Thread PlayBackThread;
 
         public string SampleFile
         {
@@ -82,6 +84,7 @@ namespace PhantomHead
 
         private void stopPlayBack()
         {
+            PlayBackThread.Abort();
             _StopEnabled = true;
             _enable_Timer.Write(GpioPinValue.Low);
             ad5360.stopPlayBack();
@@ -159,7 +162,11 @@ namespace PhantomHead
         {
             //try to use the physical application location or the relative file location from the 
             //location where the application is running
+            PlayFile();
+        }
 
+        private void PlayFile()
+        {
             EnablePlayback();
 
             var tmp = System.IO.Directory.GetCurrentDirectory();
@@ -168,12 +175,13 @@ namespace PhantomHead
             {
                 using (StreamReader sr = File.OpenText(tmp))
                 {
+                    _TimeSlice timeslice = new _TimeSlice();
+
                     while (!sr.EndOfStream && _StopEnabled == false)
                     {
                         var line = sr.ReadLine();
                         string[] values = line.Split(',');
                         var floats = new List<double>();
-                        _TimeSlice timeslice = new _TimeSlice();
                         for (int channel = 0; channel < 15; channel++)
                         {
                             try
@@ -189,9 +197,27 @@ namespace PhantomHead
                         }
                         ad5360.add_WrtieFrame(timeslice);
                     }
+
+                    for (int channel = 0; channel < 15; channel++)
+                    {
+                        try
+                        {
+                            var value = 0;
+                            _writeBuffer buff = new _writeBuffer(channel, value);
+                            timeslice.timeSlice.Add(buff);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message.ToString();
+                        }
+                    }
+                    ad5360.add_WrtieFrame(timeslice);
+                }
+                while (ad5360.playBackBusy() == true)
+                {
+
                 }
             }
-
         }
 
         private async void btnRndFile_Click(object sender, RoutedEventArgs e)
@@ -281,6 +307,8 @@ namespace PhantomHead
         private void Click_Stop(object sender, RoutedEventArgs e)
         {
             stopPlayBack();
+            txt_PlayStatus.Text = "Stopped";
+            txt_PlayStatus.FontSize = 20;
         }
     }
 }
