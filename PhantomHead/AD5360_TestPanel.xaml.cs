@@ -1,22 +1,16 @@
 ﻿using SPIController;
 using System;
-using System.Threading.Tasks;
-using Windows.Devices.Enumeration;
 using Windows.Devices.Gpio;
 using Windows.Devices.Spi;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 using System.IO;
-using System.Reflection;
-using System.Text;
 using System.Collections.Generic;
-using Windows.ApplicationModel;
-using Windows.System;
-using Windows.Media.Devices.Core;
-using System.Threading;
-
+using Windows.System.Threading;
+using Windows.Foundation;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace PhantomHead
@@ -32,7 +26,7 @@ namespace PhantomHead
         private Boolean _StopEnabled = false;
         private const int ENABLE_PIN = 18;
         private GpioPin _enable_Timer;
-        private Thread PlayBackThread;
+        //private Thread PlayBackThread;
 
         public string SampleFile
         {
@@ -84,7 +78,7 @@ namespace PhantomHead
 
         private void stopPlayBack()
         {
-            PlayBackThread.Abort();
+            //PlayBackThread.Abort();
             _StopEnabled = true;
             _enable_Timer.Write(GpioPinValue.Low);
             ad5360.stopPlayBack();
@@ -162,7 +156,35 @@ namespace PhantomHead
         {
             //try to use the physical application location or the relative file location from the 
             //location where the application is running
+            txt_PlayStatus.Text = "Running";
             PlayFile();
+            var asyncActionPlayBack = ThreadPool.RunAsync(
+                (workitem) =>
+                {
+                    while (ad5360.playBackBusy() == true) ;
+                });
+                asyncActionPlayBack.Completed = new AsyncActionCompletedHandler(
+                    (IAsyncAction asyncInfo, AsyncStatus asyncStatus) =>
+                    {
+                        if (asyncStatus == AsyncStatus.Canceled)
+                        {
+                            return;
+                        }
+                        String updateString;
+                        updateString = "Stopped";
+                        // Update the UI thread with the CoreDispatcher.
+                        CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                            CoreDispatcherPriority.High,
+                            new DispatchedHandler(() =>
+                            {
+                                UpdateUI(updateString);
+                            }));
+                    });
+        }
+
+        private void UpdateUI(string updateString)
+        {
+            txt_PlayStatus.Text = updateString;
         }
 
         private void PlayFile()
@@ -175,10 +197,10 @@ namespace PhantomHead
             {
                 using (StreamReader sr = File.OpenText(tmp))
                 {
-                    _TimeSlice timeslice = new _TimeSlice();
 
                     while (!sr.EndOfStream && _StopEnabled == false)
                     {
+                        _TimeSlice timeslice = new _TimeSlice();
                         var line = sr.ReadLine();
                         string[] values = line.Split(',');
                         var floats = new List<double>();
@@ -197,25 +219,22 @@ namespace PhantomHead
                         }
                         ad5360.add_WrtieFrame(timeslice);
                     }
-
+                    //set output to 0 volts at the end of the file
+                    _TimeSlice Lasttimeslice = new _TimeSlice();
                     for (int channel = 0; channel < 15; channel++)
                     {
                         try
                         {
                             var value = 0;
                             _writeBuffer buff = new _writeBuffer(channel, value);
-                            timeslice.timeSlice.Add(buff);
+                            Lasttimeslice.timeSlice.Add(buff);
                         }
                         catch (Exception ex)
                         {
                             var error = ex.Message.ToString();
                         }
                     }
-                    ad5360.add_WrtieFrame(timeslice);
-                }
-                while (ad5360.playBackBusy() == true)
-                {
-
+                    ad5360.add_WrtieFrame(Lasttimeslice);
                 }
             }
         }
