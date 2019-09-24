@@ -23,9 +23,10 @@ namespace PhantomHead
         public Boolean LEDon = false;
         private const int LED_PIN = 5;
         private string _SampleFile;
-        private Boolean _StopEnabled = false;
+        private Boolean _StopEnabled = true;
         private const int ENABLE_PIN = 18;
         private GpioPin _enable_Timer;
+        public Boolean isInverted { get; set; } = false;
         //private Thread PlayBackThread;
 
         public string SampleFile
@@ -209,6 +210,10 @@ namespace PhantomHead
                             try
                             {
                                 var value = ((float)Convert.ToDouble(values[channel]) / 10);
+                                if(isInverted == true)
+                                {
+                                    value *= -1;
+                                }
                                 _writeBuffer buff = new _writeBuffer(channel, value);
                                 timeslice.timeSlice.Add(buff);
                             }
@@ -328,6 +333,15 @@ namespace PhantomHead
             stopPlayBack();
             txt_PlayStatus.Text = "Stopped";
             txt_PlayStatus.FontSize = 20;
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_StopEnabled)
+            {
+                var box = (CheckBox)sender;
+                isInverted = (Boolean)box.IsChecked;
+            }
         }
     }
 }
